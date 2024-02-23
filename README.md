@@ -21,7 +21,7 @@ Prompt: Japanese city with aliens in sky
 
 ![Japanese city with aliens in sky](image-2.png)
 
-# Aplication Screenshots
+# Application Screenshots
 
 ![homepage](image-3.png)
 
