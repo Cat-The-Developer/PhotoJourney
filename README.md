@@ -6,7 +6,7 @@ It just a simple project I didn't focused to cool ui, auth feature etc
 
 It is just like lite version of midjourney, DALL-E
 
-<a href="https://text-to-image-web-ai.vercel.app" target="_blank">Live Page</a>
+<a href="https://text-to-image-web-ai.vercel.app">Live Page</a>
 
 # TO-DOs
 * Add a loader when rendering the image
