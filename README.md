@@ -8,10 +8,6 @@ It is just like lite version of midjourney, DALL-E
 
 <a href="https://text-to-image-web-ai.vercel.app">Live Page</a>
 
-# TO-DOs
-* Add a loader when rendering the image
-  * Since AI generates a High quality image which takes time to read and render by javascript
-
 # Prompt and Its Generated Images
 
 Prompt: Cat
