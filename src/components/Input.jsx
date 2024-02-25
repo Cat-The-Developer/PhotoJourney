@@ -1,25 +1,41 @@
 import { useState, useEffect } from "react";
 
-async function query(data) {
-  const response = await fetch(
-    "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0",
-    {
-      headers: {
-        Authorization: `Bearer ${import.meta.env.VITE_AI_MODEL}`,
-      },
-      method: "POST",
-      body: JSON.stringify(data),
-    }
-  );
-  const result = await response.blob();
-  return result;
-}
-
 const Input = () => {
   const [src, setSrc] = useState("");
   const [prompt, setPrompt] = useState("");
   const [blob, setBlob] = useState(null);
   const [disability, setDisability] = useState(false);
+  const [error, setError] = useState(null);
+  const [imageLoader, setImageLoader] = useState(
+    "rendering the image here may take time"
+  );
+
+  async function query(data) {
+    try {
+      const response = await fetch(
+        "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0",
+        {
+          headers: {
+            Authorization: `Bearer ${import.meta.env.VITE_AI_MODEL}`,
+          },
+          method: "POST",
+          body: JSON.stringify(data),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch data");
+      }
+
+      const result = await response.blob();
+
+      setImageLoader("rendering the image...");
+
+      return result;
+    } catch (error) {
+      throw new Error("Error Occured: " + error.message);
+    }
+  }
 
   useEffect(() => {
     if (blob) {
@@ -27,6 +43,7 @@ const Input = () => {
       reader.onload = function (e) {
         let src = e.target.result;
         setSrc(src);
+        setImageLoader("Image loaded");
         setDisability(false); // Set disability to false after setting the messages
       };
       reader.readAsDataURL(blob);
@@ -34,10 +51,17 @@ const Input = () => {
   }, [blob]);
 
   function submit(input) {
-    query({ inputs: input }).then((response) => {
-      setBlob(response);
-      setDisability(true); // Disable input while fetching
-    });
+    setSrc("");
+    query({ inputs: input })
+      .then((response) => {
+        setBlob(response);
+        setDisability(true); // Disable input while fetching
+        setError(null); // Reset error if any
+      })
+      .catch((error) => {
+        setError(error.message);
+      });
+    setImageLoader("AI is thinking...");
   }
 
   // Function to handle image download
@@ -54,6 +78,7 @@ const Input = () => {
 
   return (
     <div className="flex flex-col h-full">
+      {error && <p className="text-red-500">{error}</p>}
       <input
         type="text"
         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -71,14 +96,14 @@ const Input = () => {
           if (prompt.trim() !== "") {
             submit(prompt);
           } else {
-            alert("Enter a prompt");
+            setError("Enter a prompt");
           }
         }}
       >
         Compute
       </button>
 
-      <p>rendering the image here may take time</p>
+      <p>{imageLoader}</p>
 
       <div className="h-full mt-5 rounded-lg border-2 border-dashed ">
         <div className="border-b py-1 px-2 flex items-center justify-center gap-4">
